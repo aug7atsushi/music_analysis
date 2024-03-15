@@ -52,3 +52,16 @@ class TrackRetriever:
         for i, track in enumerate(tracks):
             logger.info("%s. %s", i + 1, track["name"])
         return tracks
+
+    def glob_playlist_tracks(self, pl_id: str):
+        """プレイリストのトラックを取得"""
+        results = self.sp.playlist_tracks(pl_id)
+        tracks = [result["track"] for result in results["items"]]
+        # print(tracks)
+
+        while results["next"]:
+            results = self.sp.next(results)
+            for result in results["items"]:
+                track = result["track"]
+                tracks.append(track)
+        return tracks

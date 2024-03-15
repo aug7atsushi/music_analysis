@@ -1,6 +1,7 @@
 from typing import Dict, List
 
 import pandas as pd
+import spotipy
 
 from music_analysis.consts import FEATURES_KEYS, FEATURES_MAPPING_DICT
 from music_analysis.utils.dataframe import get_key, get_mode
@@ -10,7 +11,7 @@ logger = get_module_logger(__name__)
 
 
 class TrackInfoTable:
-    def __init__(self, sp, tracks) -> None:
+    def __init__(self, sp: spotipy.client.Spotify, tracks: List[Dict]) -> None:
         self.sp = sp
         self.tracks = tracks
         self.track_ids = [track["id"] for track in self.tracks]
