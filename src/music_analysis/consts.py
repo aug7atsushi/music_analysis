@@ -1,0 +1,36 @@
+FEATURES_KEYS = [
+    "duration_ms",
+    "loudness",
+    "tempo",
+    "time_signature",
+    "key",
+    "mode",
+    "danceability",
+    "energy",
+    "speechiness",
+    "acousticness",
+    "instrumentalness",
+    "liveness",
+    "valence",
+]
+
+
+FEATURES_MAPPING_DICT = {
+    "track_id": "トラックID",
+    "artist_id": "アーティストID",
+    "track_name": "トラック名",
+    "artist_name": "アーティスト名",
+    "duration": "曲長[s]",
+    "loudness": "平均ラウドネス[dB]",
+    "tempo": "テンポ(BPM)",
+    "time_signature": "拍子",
+    "key": "キー",
+    "mode": "長短長",
+    "danceability": "danceability",
+    "energy": "energy",
+    "speechiness": "speechiness",
+    "acousticness": "acousticness",
+    "instrumentalness": "instrumentalness",
+    "liveness": "liveness",
+    "valence": "valence",
+}
