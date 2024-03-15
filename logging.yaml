@@ -3,7 +3,7 @@ disable_existing_loggers: False
 
 loggers:
   root:
-    level: DEBUG
+    level: INFO
     handlers: [console_handler, file_handler]
     propagate: no
 
