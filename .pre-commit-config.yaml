@@ -26,11 +26,11 @@ repos:
       types: [python]
     - id: nbqa-black
       name: nbqa-black
-      entry: nbqa-black
+      entry: nbqa black
       language: system
-      types: [python]
+      types: [jupyter]
     - id: nbqa-isort
       name: nbqa-isort
-      entry: nbqa-isort
+      entry: nbqa isort
       language: system
-      types: [python]
+      types: [jupyter]
