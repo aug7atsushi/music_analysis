@@ -24,5 +24,5 @@ def get_key(key: int) -> str:
     return key_class.get(key, "Invalid key")
 
 
-def convert_msec2sec(value: int) -> int:
-    return int(value / 1000)
+def convert_msec2sec(value: int) -> float:
+    return value / 1000

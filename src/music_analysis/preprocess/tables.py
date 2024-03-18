@@ -3,7 +3,12 @@ from typing import Dict, List
 import pandas as pd
 import spotipy
 
-from music_analysis.consts import FEATURES_KEYS, FEATURES_MAPPING_DICT
+from music_analysis.consts import (
+    CATEGORICAL_FEATURES_KEYS,
+    FEATURES_DICT,
+    NUMERIC_FEATURES_KEYS,
+    ORIGINAL_KEYS,
+)
 from music_analysis.utils.dataframe import convert_msec2sec, get_key, get_mode
 from music_analysis.utils.log import get_module_logger
 
@@ -15,6 +20,7 @@ class TrackInfoTable:
         self.sp = sp
         self.tracks = tracks
         self.track_ids = [track["id"] for track in self.tracks]
+        self.track_info_df = None
 
     def _filter_track_info(self, track: List[Dict], features: List[Dict]) -> Dict:
         filtered_track = self._filter_track_dict(track)
@@ -35,20 +41,24 @@ class TrackInfoTable:
 
         # 特定のキーのみを抽出して新しい辞書を作成
         new_d = {
-            key: features_dict[key] for key in FEATURES_KEYS if key in features_dict
+            key: features_dict[key] for key in ORIGINAL_KEYS if key in features_dict
         }
         return new_d
 
-    def _post_process(self, track_info_df: pd.DataFrame) -> pd.DataFrame:
-        track_info_df["key"] = track_info_df["key"].apply(get_key)
-        track_info_df["mode"] = track_info_df["mode"].apply(get_mode)
-        track_info_df["duration"] = (
-            track_info_df["duration_ms"]
-            .apply(convert_msec2sec)
-            .drop(columns=["duration_ms"])
+    def _post_process(self) -> None:
+        # 値の置換
+        self.track_info_df["duration"] = self.track_info_df["duration_ms"].apply(
+            convert_msec2sec
         )
-        track_info_df = track_info_df.rename(columns=FEATURES_MAPPING_DICT)
-        return track_info_df
+        self.track_info_df.drop(columns=["duration_ms"], inplace=True)
+        self.track_info_df["key"] = self.track_info_df["key"].apply(get_key)
+        self.track_info_df["mode"] = self.track_info_df["mode"].apply(get_mode)
+
+        # 型変換
+        self._convert_dtypes()
+
+        # カラム名変更
+        self.track_info_df = self.track_info_df.rename(columns=FEATURES_DICT)
 
     def audio_features(self, n_max_track=100) -> List[Dict]:
 
@@ -64,11 +74,22 @@ class TrackInfoTable:
         return audio_features
 
     def get_track_info_df(self) -> pd.DataFrame:
-        track_info_df = []
+        df = []
         for track, features in zip(self.tracks, self.audio_features()):
             _track_info = self._filter_track_info(track, features)
-            track_info_df.append(_track_info)
+            df.append(_track_info)
 
-        track_info_df = pd.DataFrame(track_info_df)
-        track_info_df = self._post_process(track_info_df)
-        return track_info_df
+        self.track_info_df = pd.DataFrame(df)
+        self._post_process()
+        return self.track_info_df
+
+    def _convert_dtypes(self) -> None:
+        # Numeric
+        self.track_info_df[NUMERIC_FEATURES_KEYS] = self.track_info_df[
+            NUMERIC_FEATURES_KEYS
+        ].astype(pd.Float32Dtype())
+
+        # Categorical
+        self.track_info_df[CATEGORICAL_FEATURES_KEYS] = self.track_info_df[
+            CATEGORICAL_FEATURES_KEYS
+        ].astype("category")
