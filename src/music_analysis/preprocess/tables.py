@@ -4,10 +4,11 @@ import pandas as pd
 import spotipy
 
 from music_analysis.consts import (
-    CATEGORICAL_FEATURES_KEYS,
-    FEATURES_DICT,
-    NUMERIC_FEATURES_KEYS,
-    ORIGINAL_KEYS,
+    CATEGORICAL_COLS_KEYS,
+    DATETIME_COLS_KEYS,
+    NUMERIC_COLS_KEYS,
+    USED_AUDIO_FEATURES_KEYS,
+    USED_COLS_DICT,
 )
 from music_analysis.utils.dataframe import convert_msec2sec, get_key, get_mode
 from music_analysis.utils.log import get_module_logger
@@ -31,17 +32,23 @@ class TrackInfoTable:
         d = dict(
             track_id=track_dict["id"],
             artist_id=track_dict["artists"][0]["id"],
+            album_id=track_dict["album"]["id"],
             track_name=track_dict["name"],
             artist_name=track_dict["artists"][0]["name"],
+            album_name=track_dict["album"]["name"],
+            album_type=track_dict["album"]["album_type"],
+            release_date=track_dict["album"]["release_date"],
+            release_date_precision=track_dict["album"]["release_date_precision"],
+            popularity=track_dict["popularity"],
         )
         return d
 
     def _filter_features_dict(self, features_dict: dict):
-        # NOTE: album, release_date, popularityなどは別から取ってこないといけない
-
         # 特定のキーのみを抽出して新しい辞書を作成
         new_d = {
-            key: features_dict[key] for key in ORIGINAL_KEYS if key in features_dict
+            key: features_dict[key]
+            for key in USED_AUDIO_FEATURES_KEYS
+            if key in features_dict
         }
         return new_d
 
@@ -58,7 +65,7 @@ class TrackInfoTable:
         self._convert_dtypes()
 
         # カラム名変更
-        self.track_info_df = self.track_info_df.rename(columns=FEATURES_DICT)
+        self.track_info_df = self.track_info_df.rename(columns=USED_COLS_DICT)
 
     def audio_features(self, n_max_track=100) -> List[Dict]:
 
@@ -85,11 +92,17 @@ class TrackInfoTable:
 
     def _convert_dtypes(self) -> None:
         # Numeric
-        self.track_info_df[NUMERIC_FEATURES_KEYS] = self.track_info_df[
-            NUMERIC_FEATURES_KEYS
+        self.track_info_df[NUMERIC_COLS_KEYS] = self.track_info_df[
+            NUMERIC_COLS_KEYS
         ].astype(pd.Float32Dtype())
 
         # Categorical
-        self.track_info_df[CATEGORICAL_FEATURES_KEYS] = self.track_info_df[
-            CATEGORICAL_FEATURES_KEYS
+        self.track_info_df[CATEGORICAL_COLS_KEYS] = self.track_info_df[
+            CATEGORICAL_COLS_KEYS
         ].astype("category")
+
+        # Datetime
+        for datetime_col in DATETIME_COLS_KEYS:
+            self.track_info_df[datetime_col] = pd.to_datetime(
+                self.track_info_df[datetime_col]
+            )
