@@ -79,7 +79,11 @@ class TrackRetriever(RetrieverBase):
         results = self.sp.playlist_tracks(pl_id)
 
         # print(tracks)
-        track_ids = [result["track"]["id"] for result in results["items"]]
+        track_ids = [
+            result["track"]["id"]
+            for result in results["items"]
+            if result["track"] is not None
+        ]
         while results["next"]:
             results = self.sp.next(results)
             for result in results["items"]:

@@ -104,5 +104,5 @@ class TrackInfoTable:
         # Datetime
         for datetime_col in DATETIME_COLS_KEYS:
             self.track_info_df[datetime_col] = pd.to_datetime(
-                self.track_info_df[datetime_col]
+                self.track_info_df[datetime_col], format="mixed"
             )
