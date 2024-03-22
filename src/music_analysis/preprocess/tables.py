@@ -10,15 +10,16 @@ from music_analysis.consts import (
     USED_AUDIO_FEATURES_KEYS,
     USED_COLS_DICT,
 )
+from music_analysis.preprocess.base import SpotifyClientBase
 from music_analysis.utils.dataframe import convert_msec2sec, get_key, get_mode
 from music_analysis.utils.log import get_module_logger
 
 logger = get_module_logger(__name__)
 
 
-class TrackInfoTable:
+class TrackInfoTable(SpotifyClientBase):
     def __init__(self, sp: spotipy.client.Spotify, tracks: List[Dict]) -> None:
-        self.sp = sp
+        super().__init__(sp)
         self.tracks = tracks
         self.track_ids = [track["id"] for track in self.tracks]
         self.track_info_df = None

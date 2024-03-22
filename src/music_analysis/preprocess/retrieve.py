@@ -2,17 +2,13 @@ from typing import Dict, List
 
 import spotipy
 
+from music_analysis.preprocess.base import SpotifyClientBase
 from music_analysis.utils.log import get_module_logger
 
 logger = get_module_logger(__name__)
 
 
-class RetrieverBase:
-    def __init__(self, sp: spotipy.client.Spotify) -> None:
-        self.sp = sp
-
-
-class TrackRetriever(RetrieverBase):
+class TrackRetriever(SpotifyClientBase):
     def __init__(self, sp: spotipy.Spotify) -> None:
         super().__init__(sp)
 
@@ -107,7 +103,7 @@ class TrackRetriever(RetrieverBase):
         return track_infos
 
 
-class ArtistRetriver(RetrieverBase):
+class ArtistRetriver(SpotifyClientBase):
     def __init__(self, sp: spotipy.Spotify) -> None:
         super().__init__(sp)
 
