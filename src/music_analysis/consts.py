@@ -56,4 +56,5 @@ USED_COLS_DICT = NUMERIC_COLS_DICT | CATEGORICAL_COLS_DICT | DATETIME_COLS_DICT
 PROMPT_COVER_IMG_TEMPLATE = """
 プレイリストのカバー画像を作成してください。
 プレイリストのジャンルは、Lofi-Hiphopです。
+チルアウトや穏やかというキーワードをもとに描画してください。
 """
