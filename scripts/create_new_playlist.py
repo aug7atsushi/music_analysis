@@ -1,6 +1,6 @@
 from pathlib import Path
 
-import fire
+# import fire
 import spotipy
 import yaml
 from dotenv import load_dotenv
@@ -26,7 +26,9 @@ class Config:
         return "\n".join(attributes)
 
 
-def main(cfg_path: str):
+def main(
+    cfg_path: str = Path(__file__).parents[1] / "configs" / "create_new_playlist.yaml",
+):
     cfg = Config(Path(cfg_path))
     print(cfg)
 
@@ -59,4 +61,5 @@ def main(cfg_path: str):
 
 
 if __name__ == "__main__":
-    fire.Fire(main)
+    # fire.Fire(main)
+    main()
