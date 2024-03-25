@@ -1,6 +1,7 @@
+from datetime import date
 from pathlib import Path
 
-# import fire
+import fire
 import spotipy
 import yaml
 from dotenv import load_dotenv
@@ -26,9 +27,8 @@ class Config:
         return "\n".join(attributes)
 
 
-def main(
-    cfg_path: str = Path(__file__).parents[1] / "configs" / "create_new_playlist.yaml",
-):
+def main(cfg_path: str):
+    today = date.today().strftime("%Y%m%d")
     cfg = Config(Path(cfg_path))
     print(cfg)
 
@@ -51,7 +51,7 @@ def main(
     playlist_creator = PlaylistCreator(
         sp=sp,
         user_id=sp.me()["id"],
-        name=cfg.name,
+        name=f"{cfg.name} #{today}",
         public=cfg.public,
         collaborative=cfg.collaborative,
         description=cfg.description,
@@ -61,5 +61,4 @@ def main(
 
 
 if __name__ == "__main__":
-    # fire.Fire(main)
-    main()
+    fire.Fire(main)
