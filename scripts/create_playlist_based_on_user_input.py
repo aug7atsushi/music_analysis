@@ -3,28 +3,15 @@ from pathlib import Path
 
 import fire
 import spotipy
-import yaml
 from dotenv import load_dotenv
 from spotipy.oauth2 import SpotifyOAuth
 
 from music_analysis import REPO_ROOT
 from music_analysis.preprocess.playlist import PlaylistCreator
 from music_analysis.preprocess.recommend import TrackRecommender
+from music_analysis.utils.config import Config
 
 load_dotenv(REPO_ROOT / ".env")
-
-
-class Config:
-    def __init__(self, config_path: str) -> None:
-        with open(config_path, "r") as f:
-            self.config = yaml.safe_load(f)
-
-        for k, v in self.config.items():
-            setattr(self, k, v)
-
-    def __str__(self):
-        attributes = [f"{k}: {v}" for k, v in self.config.items()]
-        return "\n".join(attributes)
 
 
 def main(cfg_path: str):

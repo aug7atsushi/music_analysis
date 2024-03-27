@@ -18,7 +18,7 @@ class TrackRetriever(SpotifyClientBase):
         album_types: List[str] = ["album", "single", "appears_on", "compilation"],
     ) -> List[Dict]:
         """アーティストの全アルバムの全トラックを取得"""
-        album_ids = self._get_artist_album_ids(artist_id, album_types=album_types)
+        album_ids = self.get_artist_album_ids(artist_id, album_types=album_types)
 
         tracks = []
         for album_id in album_ids:
@@ -28,17 +28,17 @@ class TrackRetriever(SpotifyClientBase):
 
     def glob_album_tracks(self, album_id: str) -> List[Dict]:
         """アルバムのトラックを取得"""
-        track_ids = self._get_album_track_ids(album_id)
+        track_ids = self.get_album_track_ids(album_id)
         tracks = self.get_track_infos(track_ids)
         return tracks
 
     def glob_playlist_tracks(self, pl_id: str) -> List[Dict]:
         """プレイリストのトラックを取得"""
-        track_ids = self._get_playlist_track_ids(pl_id)
+        track_ids = self.get_playlist_track_ids(pl_id)
         tracks = self.get_track_infos(track_ids)
         return tracks
 
-    def _get_artist_album_ids(
+    def get_artist_album_ids(
         self,
         artist_id: str,
         album_types: List[str] | None,
@@ -57,7 +57,7 @@ class TrackRetriever(SpotifyClientBase):
         logger.info(f"Total albums: {len(album_ids)}")
         return album_ids
 
-    def _get_album_track_ids(self, album_id: str) -> List[str]:
+    def get_album_track_ids(self, album_id: str) -> List[str]:
         """アルバム内に含まれるトラックIDを取得"""
         results = self.sp.album_tracks(album_id)
 
@@ -70,7 +70,7 @@ class TrackRetriever(SpotifyClientBase):
         logger.info(f"This album inclues {len(track_ids)} tracks")
         return track_ids
 
-    def _get_playlist_track_ids(self, pl_id: str):
+    def get_playlist_track_ids(self, pl_id: str):
         """プレイリスト内に含まれるトラックIDを取得"""
         results = self.sp.playlist_tracks(pl_id)
 
@@ -87,6 +87,28 @@ class TrackRetriever(SpotifyClientBase):
                 track_ids.append(track_id)
         logger.info(f"This playlist inclues {len(track_ids)} tracks")
         return track_ids
+
+    def get_my_favorite_track_ids(self):
+        """ユーザがお気に入り登録したトラックIDを取得"""
+        results = self.sp.current_user_saved_tracks()
+
+        track_ids = [result["track"]["id"] for result in results["items"]]
+        while results["next"]:
+            results = self.sp.next(results)
+            for result in results["items"]:
+                track_id = result["track"]["id"]
+                track_ids.append(track_id)
+            logger.info(f"My favorite list includes {len(track_ids)} tracks")
+        return track_ids
+
+    def get_new_release_album_ids(
+        self, country: str = None, limit: int = 20
+    ) -> List[str]:
+        """ニューリリースされたアルバムIDを取得"""
+        results = self.sp.new_releases(country=country, limit=limit)["albums"]
+
+        album_ids = [result["id"] for result in results["items"]]
+        return album_ids
 
     def get_track_infos(self, track_ids: List[str], n_max_track: int = 50):
         """指定されたIDのトラックを取得"""

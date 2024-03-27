@@ -13,15 +13,15 @@ from music_analysis.consts import (
 from music_analysis.preprocess.base import SpotifyClientBase
 from music_analysis.utils.dataframe import convert_msec2sec, get_key, get_mode
 from music_analysis.utils.log import get_module_logger
+from music_analysis.utils.utils import split_array2subarry
 
 logger = get_module_logger(__name__)
 
 
 class TrackInfoTable(SpotifyClientBase):
-    def __init__(self, sp: spotipy.client.Spotify, tracks: List[Dict]) -> None:
+    def __init__(self, sp: spotipy.client.Spotify, track_ids: List[str]) -> None:
         super().__init__(sp)
-        self.tracks = tracks
-        self.track_ids = [track["id"] for track in self.tracks]
+        self.track_ids = track_ids
         self.track_info_df = None
 
     def _filter_track_info(self, track: List[Dict], features: List[Dict]) -> Dict:
@@ -68,13 +68,18 @@ class TrackInfoTable(SpotifyClientBase):
         # カラム名変更
         self.track_info_df = self.track_info_df.rename(columns=USED_COLS_DICT)
 
-    def audio_features(self, n_max_track=100) -> List[Dict]:
+    def get_track_dicts(self, n_max_track=50) -> List[Dict]:
+        # 1回に抽出できる量が最大50件のため部分集合へ分割
+        subset_track_ids = split_array2subarry(self.track_ids, n_max_track)
 
+        track_dicts = []
+        for track_ids in subset_track_ids:
+            track_dicts.extend(self.sp.tracks(track_ids)["tracks"])
+        return track_dicts
+
+    def get_audio_features(self, n_max_track=100) -> List[Dict]:
         # 1回に抽出できる量が最大100件のため部分集合へ分割
-        subset_track_ids = [
-            self.track_ids[i : i + n_max_track]
-            for i in range(0, len(self.track_ids), n_max_track)
-        ]
+        subset_track_ids = split_array2subarry(self.track_ids, n_max_track)
 
         audio_features = []
         for track_ids in subset_track_ids:
@@ -83,7 +88,7 @@ class TrackInfoTable(SpotifyClientBase):
 
     def get_track_info_df(self) -> pd.DataFrame:
         df = []
-        for track, features in zip(self.tracks, self.audio_features()):
+        for track, features in zip(self.get_track_dicts(), self.get_audio_features()):
             _track_info = self._filter_track_info(track, features)
             df.append(_track_info)
 
