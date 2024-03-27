@@ -1,0 +1,12 @@
+name: New Release Top Tracks
+public: true
+collaborative: false
+description: 注目されている最新リリーストラックを集めたプレイリスト。A playlist featuring the latest trending tracks.
+n_track: 20
+country:
+
+# プレイリスト作成に使用されるアルバム数(このアルバムの中から`n_track`分選ばれる)
+n_used_album: 30
+
+# 重複を許す個数
+n_duplicate_track_in_same_album: 5
