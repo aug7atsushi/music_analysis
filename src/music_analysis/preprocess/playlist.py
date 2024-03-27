@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict, List
 
 import spotipy
@@ -5,7 +6,7 @@ import spotipy
 from music_analysis.consts import PROMPT_COVER_IMG_TEMPLATE
 from music_analysis.preprocess.base import SpotifyClientBase
 from music_analysis.preprocess.dalle import DalleImageGenerator
-from music_analysis.utils.image import convert_b64png_to_b64jpg
+from music_analysis.utils.image import convert_b64png_to_b64jpg, read_image_as_b64jpg
 
 
 class PlaylistCreator(SpotifyClientBase):
@@ -14,11 +15,13 @@ class PlaylistCreator(SpotifyClientBase):
         sp: spotipy.client.Spotify,
         user_id: str,
         name: str,
+        cover_image_path: str,
         public: bool = False,
         collaborative: bool = False,
         description: str = None,
     ) -> None:
         super().__init__(sp=sp)
+        self.cover_image_path = Path(cover_image_path)
         self.image_generator = DalleImageGenerator()
 
         new_playlist = self.create_empty_playlist(
@@ -67,4 +70,8 @@ class PlaylistCreator(SpotifyClientBase):
 
     def create_upload_cover_image(self) -> None:
         b64jpg_img = self._create_cover_image(prompt=PROMPT_COVER_IMG_TEMPLATE)
+        self._upload_cover_image(playlist_id=self.playlist_id, b64jpg_img=b64jpg_img)
+
+    def upload_cover_image_from_local(self) -> None:
+        b64jpg_img = read_image_as_b64jpg(self.cover_image_path)
         self._upload_cover_image(playlist_id=self.playlist_id, b64jpg_img=b64jpg_img)

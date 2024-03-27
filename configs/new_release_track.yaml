@@ -10,3 +10,4 @@ n_used_album: 30
 
 # 重複を許す個数
 n_duplicate_track_in_same_album: 5
+cover_image_path: cover_imgs/ai_apple.jpeg
