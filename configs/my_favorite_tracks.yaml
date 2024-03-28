@@ -1,7 +1,8 @@
 name: My Curated Playlist
-public: true
+public: false
 collaborative: false
 description: 自分のお気に入りトラックをもとに作成したプレイリスト。A playlist created based on my favorite tracks.
 
 # for recommendation
 limit: 20
+cover_image_path: cover_imgs/yellow.webp

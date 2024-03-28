@@ -22,7 +22,7 @@ def main(cfg_path: str):
 
     # spotipy clientの作成
     scope = "playlist-modify-public,playlist-modify-private,ugc-image-upload,user-library-modify,user-library-read"  # noqa
-    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+    sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope, open_browser=False))
 
     # お気に入りトラックを取得
     track_retriever = TrackRetriever(sp=sp)
@@ -40,12 +40,13 @@ def main(cfg_path: str):
         sp=sp,
         user_id=sp.me()["id"],
         name=f"{cfg.name} #{today}",
+        cover_image_path=cfg.cover_image_path,
         public=cfg.public,
         collaborative=cfg.collaborative,
         description=cfg.description,
     )
     playlist_creator.add_tracks(track_ids=track_ids)
-    # playlist_creator.create_upload_cover_image()
+    playlist_creator.upload_cover_image_from_local()
 
 
 if __name__ == "__main__":
