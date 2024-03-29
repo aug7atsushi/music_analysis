@@ -3,6 +3,8 @@ name: Zen Study Lofi Playlist
 public: true
 collaborative: false
 description: このプレイリストでは、作業用や勉強用にLofi-Hiphopを中心にトラックを公開しています。This playlist features tracks primarily in the Lofi-Hiphop genre, ideal for work or study purposes.
+cover_image_path: cover_imgs/purple.webp
+
 
 # for recommendation
 seed_artists:
@@ -11,7 +13,7 @@ seed_tracks:
   # - "7fFwkEjPSEapRqQRSOH8uL"
 seed_genres:
   # - "soul"
-limit: 20
+limit: 50
 country:
 audio_features: {}
   # min_danceability: 0.6

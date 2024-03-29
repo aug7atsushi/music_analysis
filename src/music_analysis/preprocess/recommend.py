@@ -11,9 +11,9 @@ logger = get_module_logger(__name__)
 
 
 class RecommendSeed(BaseModel):
-    seed_artists: List[str] = Field(..., min_length=0, max_length=5)
-    seed_tracks: List[str] = Field(..., min_length=0, max_length=5)
-    seed_genres: List[str] = Field(..., min_length=0, max_length=5)
+    seed_artists: List[str] = Field(..., min_items=0, max_items=5)
+    seed_tracks: List[str] = Field(..., min_items=0, max_items=5)
+    seed_genres: List[str] = Field(..., min_items=0, max_items=5)
     limit: int = Field(..., ge=1, le=100)
     country: Optional[str] = None
     kwargs: dict = {}
@@ -37,9 +37,9 @@ class TrackRecommender(SpotifyClientBase):
 
     def get_recommended_track_ids(
         self,
-        seed_artists: List[str] = [],
-        seed_tracks: List[str] = [],
-        seed_genres: List[str] = [],
+        seed_artists: List[str] | None = None,
+        seed_tracks: List[str] | None = None,
+        seed_genres: List[str] | None = None,
         limit: int = 20,
         country: str | None = None,
         **kwargs,
@@ -49,6 +49,8 @@ class TrackRecommender(SpotifyClientBase):
         seed_artists = TrackRecommender.sample(seed_artists, n_max=5)
         seed_tracks = TrackRecommender.sample(seed_tracks, n_max=5)
         seed_genres = TrackRecommender.sample(seed_genres, n_max=5)
+
+        print(type(seed_artists), type(seed_tracks), type(seed_genres))
 
         # Validation
         recommend_seed = RecommendSeed(
@@ -72,7 +74,10 @@ class TrackRecommender(SpotifyClientBase):
         return [track["id"] for track in tracks]
 
     @staticmethod
-    def sample(list: List, n_max: int = 5):
+    def sample(list: List | None, n_max: int = 5):
+        if list is None:
+            list = []
+
         if len(list) <= n_max:
             return list
         else:

@@ -39,12 +39,14 @@ def main(cfg_path: str):
         sp=sp,
         user_id=sp.me()["id"],
         name=f"{cfg.name} #{today}",
+        cover_image_path=cfg.cover_image_path,
         public=cfg.public,
         collaborative=cfg.collaborative,
         description=cfg.description,
     )
     playlist_creator.add_tracks(track_ids=track_ids)
-    playlist_creator.create_upload_cover_image()
+    # playlist_creator.create_upload_cover_image()
+    playlist_creator.upload_cover_image_from_local()
 
 
 if __name__ == "__main__":
