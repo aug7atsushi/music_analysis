@@ -22,7 +22,6 @@ class PlaylistCreator(SpotifyClientBase):
     ) -> None:
         super().__init__(sp=sp)
         self.cover_image_path = Path(cover_image_path)
-        self.image_generator = DalleImageGenerator()
 
         new_playlist = self.create_empty_playlist(
             user_id=user_id,
@@ -54,6 +53,7 @@ class PlaylistCreator(SpotifyClientBase):
         self.sp.playlist_add_items(playlist_id=self.playlist_id, items=track_ids)
 
     def _create_cover_image(self, prompt: str) -> str:
+        self.image_generator = DalleImageGenerator()
         b64png_img = self.image_generator.get_generated_images_as_b64(
             prompt=prompt,
             n=1,
